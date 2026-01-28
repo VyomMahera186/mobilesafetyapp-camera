@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>MobileSafetyApp - Camera Image</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#111;
+      color:white;
+      text-align:center;
+      padding:20px;
+    }
+    img{
+      max-width: 95%;
+      border-radius: 12px;
+      margin-top: 20px;
+      box-shadow: 0px 0px 20px rgba(255,255,255,0.2);
+    }
+    .box{
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+      background:#1e1e1e;
+      border-radius: 12px;
+    }
+    a{color:#00d0ff}
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h2>📷 Camera Capture</h2>
+    <p id="status">Loading image...</p>
+    <img id="photo" style="display:none;" />
+    <p style="margin-top:15px;font-size:14px;opacity:0.8;">
+      If you see "No image found", check the ID in the link.
+    </p>
+  </div>
+
+  <script>
+    // 🔥 Replace this with YOUR firebase project id
+    const FIREBASE_PROJECT_ID = "mobilesafetyapp-7629d";
+    const DB_URL = `https://${FIREBASE_PROJECT_ID}-default-rtdb.firebaseio.com`;
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    const status = document.getElementById("status");
+    const photo = document.getElementById("photo");
+
+    if(!id){
+      status.innerText = "❌ No image ID provided.";
+    } else {
+      const url = `${DB_URL}/camera_images/${id}.json`;
+
+      fetch(url)
+        .then(r => r.json())
+        .then(base64 => {
+          if(!base64){
+            status.innerText = "❌ No image found for this ID.";
+            return;
+          }
+
+          photo.src = "data:image/jpeg;base64," + base64;
+          photo.style.display = "block";
+          status.innerText = "✅ Image loaded successfully.";
+        })
+        .catch(err => {
+          console.error(err);
+          status.innerText = "❌ Error loading image.";
+        });
+    }
+  </script>
+</body>
+</html>
